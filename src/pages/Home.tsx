@@ -16,7 +16,7 @@ const Home = () => {
     from: new Date(),
     to: addDays(new Date(), 1),
   });
-  const [roomType, setRoomType] = useState<RoomType | ''>('');
+  const [roomType, setRoomType] = useState<RoomType | 'all'>('all');
 
   const handleSearch = () => {
     if (!dateRange?.from || !dateRange?.to) {
@@ -26,7 +26,7 @@ const Home = () => {
     const queryParams = new URLSearchParams({
       checkIn: dateRange.from.toISOString(),
       checkOut: dateRange.to.toISOString(),
-      ...(roomType && { roomType }),
+      ...(roomType !== 'all' && { roomType }),
     });
 
     navigate(`/rooms?${queryParams.toString()}`);
@@ -65,12 +65,12 @@ const Home = () => {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Room Type</label>
-                  <Select value={roomType} onValueChange={(value: RoomType | '') => setRoomType(value)}>
+                  <Select value={roomType} onValueChange={(value: RoomType | 'all') => setRoomType(value)}>
                     <SelectTrigger>
                       <SelectValue placeholder="All Types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Types</SelectItem>
+                      <SelectItem value="all">All Types</SelectItem>
                       <SelectItem value="single">Single</SelectItem>
                       <SelectItem value="double">Double</SelectItem>
                     </SelectContent>

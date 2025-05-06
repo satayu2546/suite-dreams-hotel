@@ -28,7 +28,7 @@ const RoomList = () => {
         }
       : undefined
   );
-  const [roomType, setRoomType] = useState<RoomType | ''>(roomTypeParam || '');
+  const [roomType, setRoomType] = useState<RoomType | 'all'>(roomTypeParam || 'all');
 
   // Search for available rooms when params change
   useEffect(() => {
@@ -36,7 +36,7 @@ const RoomList = () => {
       const availableRooms = checkAvailability({
         checkInDate: dateRange.from,
         checkOutDate: dateRange.to,
-        ...(roomType ? { roomType } : {}),
+        ...(roomType !== 'all' ? { roomType } : {}),
       });
       setAvailableRooms(availableRooms);
     }
@@ -48,7 +48,7 @@ const RoomList = () => {
       const params = new URLSearchParams();
       params.set('checkIn', dateRange.from.toISOString());
       params.set('checkOut', dateRange.to.toISOString());
-      if (roomType) {
+      if (roomType !== 'all') {
         params.set('roomType', roomType);
       }
       setSearchParams(params);
@@ -73,7 +73,7 @@ const RoomList = () => {
   };
 
   // Handle room type change
-  const handleRoomTypeChange = (value: RoomType | '') => {
+  const handleRoomTypeChange = (value: RoomType | 'all') => {
     setRoomType(value);
   };
 
@@ -98,7 +98,7 @@ const RoomList = () => {
                   <SelectValue placeholder="All Types" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Types</SelectItem>
+                  <SelectItem value="all">All Types</SelectItem>
                   <SelectItem value="single">Single</SelectItem>
                   <SelectItem value="double">Double</SelectItem>
                 </SelectContent>
