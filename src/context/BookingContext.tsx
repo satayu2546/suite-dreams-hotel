@@ -9,11 +9,11 @@ import { supabase } from '../integrations/supabase/client';
 interface BookingContextType {
   bookings: Booking[];
   userBookings: Booking[];
-  createBooking: (roomId: string, checkInDate: Date, checkOutDate: Date) => void;
-  cancelBooking: (bookingId: string) => void;
+  createBooking: (roomId: string, checkInDate: Date, checkOutDate: Date) => Promise<void>;
+  cancelBooking: (bookingId: string) => Promise<void>;
   checkAvailability: (params: AvailabilityParams) => Promise<Room[]>;
   getBooking: (bookingId: string) => Booking | undefined;
-  getRoomById: (roomId: string) => Promise<Room | undefined>;
+  getRoomById: (roomId: string) => Promise<Room | null>;
 }
 
 const BookingContext = createContext<BookingContextType | null>(null);
@@ -99,10 +99,10 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
       const availableRooms = await checkAvailability({
         checkInDate,
         checkOutDate,
-        roomType: undefined,
       });
 
-      if (!availableRooms.some(room => room.id === roomId)) {
+      const isAvailable = availableRooms.some(room => room.id === roomId);
+      if (!isAvailable) {
         toast.error('This room is not available for the selected dates');
         return;
       }
@@ -224,7 +224,7 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   // Get room by ID
-  const getRoomById = async (roomId: string): Promise<Room | undefined> => {
+  const getRoomById = async (roomId: string): Promise<Room | null> => {
     try {
       const { data, error } = await supabase
         .from('rooms')
@@ -234,13 +234,13 @@ export const BookingProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
       if (error) {
         console.error('Error fetching room:', error);
-        return undefined;
+        return null;
       }
 
       return mapDbRoomToRoom(data);
     } catch (error) {
       console.error('Failed to fetch room:', error);
-      return undefined;
+      return null;
     }
   };
 

@@ -14,6 +14,7 @@ const RoomList = () => {
   const { checkAvailability } = useBooking();
   const [availableRooms, setAvailableRooms] = useState<Room[]>([]);
   const [sortBy, setSortBy] = useState<string>('price-asc');
+  const [isLoading, setIsLoading] = useState(false);
   
   // Get search params
   const checkIn = searchParams.get('checkIn');
@@ -32,14 +33,25 @@ const RoomList = () => {
 
   // Search for available rooms when params change
   useEffect(() => {
-    if (dateRange?.from && dateRange?.to) {
-      const availableRooms = checkAvailability({
-        checkInDate: dateRange.from,
-        checkOutDate: dateRange.to,
-        ...(roomType !== 'all' ? { roomType } : {}),
-      });
-      setAvailableRooms(availableRooms);
-    }
+    const fetchAvailableRooms = async () => {
+      if (!dateRange?.from || !dateRange?.to) return;
+      
+      setIsLoading(true);
+      try {
+        const rooms = await checkAvailability({
+          checkInDate: dateRange.from,
+          checkOutDate: dateRange.to,
+          ...(roomType !== 'all' ? { roomType } : {}),
+        });
+        setAvailableRooms(rooms);
+      } catch (error) {
+        console.error('Error fetching available rooms:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAvailableRooms();
   }, [dateRange, roomType, checkAvailability]);
 
   // Update search params when filters change
@@ -119,7 +131,11 @@ const RoomList = () => {
           </div>
         </div>
 
-        {sortedRooms.length > 0 ? (
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-gray-500">Loading rooms...</p>
+          </div>
+        ) : sortedRooms.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {sortedRooms.map((room) => (
               <RoomCard key={room.id} room={room} />

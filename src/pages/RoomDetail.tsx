@@ -20,7 +20,8 @@ const RoomDetail = () => {
   const navigate = useNavigate();
   const [room, setRoom] = useState<Room | null>(null);
   const [isAvailable, setIsAvailable] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isBookingInProgress, setIsBookingInProgress] = useState(false);
 
   // Get check-in and check-out dates from URL params
   const checkIn = searchParams.get('checkIn');
@@ -35,31 +36,48 @@ const RoomDetail = () => {
       : undefined
   );
 
+  // Fetch room data when component mounts
   useEffect(() => {
-    if (roomId) {
-      const roomData = getRoomById(roomId);
-      if (roomData) {
+    const fetchRoomData = async () => {
+      if (!roomId) return;
+      
+      try {
+        setIsLoading(true);
+        const roomData = await getRoomById(roomId);
         setRoom(roomData);
+      } catch (error) {
+        console.error('Error fetching room:', error);
+        toast.error('Failed to load room details');
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
+
+    fetchRoomData();
   }, [roomId, getRoomById]);
 
+  // Check availability when dateRange or room changes
   useEffect(() => {
+    const checkRoomAvailability = async () => {
+      if (!dateRange?.from || !dateRange?.to || !roomId) return;
+
+      try {
+        const availableRooms = await checkAvailability({
+          checkInDate: dateRange.from,
+          checkOutDate: dateRange.to,
+        });
+        
+        setIsAvailable(availableRooms.some(r => r.id === roomId));
+      } catch (error) {
+        console.error('Error checking availability:', error);
+      }
+    };
+
     checkRoomAvailability();
-  }, [dateRange, room]);
+  }, [dateRange, roomId, checkAvailability]);
 
-  const checkRoomAvailability = () => {
-    if (!dateRange?.from || !dateRange?.to || !room) return;
-
-    const availableRooms = checkAvailability({
-      checkInDate: dateRange.from,
-      checkOutDate: dateRange.to,
-    });
-
-    setIsAvailable(availableRooms.some(r => r.id === roomId));
-  };
-
-  const handleBooking = () => {
+  // Handle booking creation
+  const handleBooking = async () => {
     if (!isAuthenticated) {
       toast.error('Please log in to book this room');
       navigate('/login');
@@ -71,16 +89,27 @@ const RoomDetail = () => {
       return;
     }
 
-    setIsLoading(true);
     try {
-      createBooking(roomId, dateRange.from, dateRange.to);
+      setIsBookingInProgress(true);
+      await createBooking(roomId, dateRange.from, dateRange.to);
       navigate('/bookings');
     } catch (error) {
+      console.error('Failed to create booking:', error);
       toast.error('Failed to create booking');
     } finally {
-      setIsLoading(false);
+      setIsBookingInProgress(false);
     }
   };
+
+  if (isLoading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-12 text-center">
+          <p>Loading room details...</p>
+        </div>
+      </Layout>
+    );
+  }
 
   if (!room) {
     return (
@@ -189,10 +218,10 @@ const RoomDetail = () => {
 
                   <Button
                     className="w-full"
-                    disabled={!isAvailable || !dateRange?.from || !dateRange?.to || isLoading}
+                    disabled={!isAvailable || !dateRange?.from || !dateRange?.to || isBookingInProgress}
                     onClick={handleBooking}
                   >
-                    {isLoading
+                    {isBookingInProgress
                       ? 'Processing...'
                       : !dateRange?.from || !dateRange?.to
                       ? 'Select Dates'
