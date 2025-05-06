@@ -32,3 +32,28 @@ export interface AvailabilityParams {
   checkOutDate: Date;
   roomType?: RoomType;
 }
+
+// Helper functions to convert between Supabase DB types and our application types
+export const mapDbRoomToRoom = (dbRoom: any): Room => {
+  return {
+    id: dbRoom.id,
+    name: dbRoom.name,
+    type: dbRoom.type as RoomType,
+    price: Number(dbRoom.price),
+    description: dbRoom.description,
+    amenities: Array.isArray(dbRoom.amenities) ? dbRoom.amenities : [],
+    image: dbRoom.image,
+    capacity: dbRoom.capacity
+  };
+};
+
+export const mapDbBookingToBooking = (dbBooking: any): Booking => {
+  return {
+    id: dbBooking.id,
+    userId: dbBooking.user_id,
+    roomId: dbBooking.room_id,
+    checkInDate: dbBooking.check_in_date,
+    checkOutDate: dbBooking.check_out_date,
+    createdAt: dbBooking.created_at
+  };
+};
