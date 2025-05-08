@@ -43,10 +43,10 @@ const Home = () => {
           />
           <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-white p-6 text-center">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 animate-fadeIn">
-              Experience Luxury Stays
+              Where luxury meets rest
             </h1>
             <p className="text-xl md:text-2xl max-w-2xl mb-8 animate-fadeIn">
-              Book your perfect room for June 2025 and enjoy an unforgettable experience
+              Experience restful nights and elegant comfort — only at Suite Dreams.
             </p>
           </div>
         </div>
@@ -87,12 +87,12 @@ const Home = () => {
           </Card>
         </div>
 
-        <div className="container mx-auto px-4 py-16">
+
+        {/* <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Why Choose FutureStay?</h2>
+            <h2 className="text-3xl font-bold mb-4">Why Choose Suite Dreams?</h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Experience the best in hospitality with our modern amenities and exceptional service
-            </p>
+              Experience unparalleled comfort and luxury with our top-tier amenities and exceptional service, ensuring a stay that feels like a dream.            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -112,8 +112,9 @@ const Home = () => {
               <p className="text-gray-600">Simple and secure booking process with no hidden fees.</p>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
+      
     </Layout>
   );
 };

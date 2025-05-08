@@ -22,7 +22,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <Link to="/" className="text-2xl font-bold text-primary">
-            FutureStay
+            <img 
+              src="/logo2.png"  // Path relative to public directory
+              alt="FutureStay Logo" 
+              className="h-10"  // Adjust the size of the logo
+            />
           </Link>
           
           <nav className="hidden md:flex items-center gap-6">
@@ -70,7 +74,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <footer className="bg-gray-100 py-8">
         <div className="container mx-auto px-4">
           <div className="text-center text-gray-600">
-            <p>© 2025 FutureStay. All rights reserved.</p>
+            <p>© 2025 Suite Dreams. All rights reserved.</p>
           </div>
         </div>
       </footer>
