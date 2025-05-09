@@ -17,7 +17,7 @@ const Bookings = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   // Redirect to login if not authenticated
-  React.useEffect(() => {
+  useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
     }
